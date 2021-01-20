@@ -86,7 +86,14 @@ export PATH=${SWIG_DIR}/bin:$PATH
 ##########################    installing DyNet    #########################
 
 git clone https://github.com/clab/dynet.git           || { echo 'DyNet install failed' ; exit 1; }
-hg clone https://bitbucket.org/eigen/eigen -r b2e267d || { echo 'DyNet install failed' ; exit 1; }
+# hg clone https://bitbucket.org/eigen/eigen -r b2e267d || { echo 'DyNet install failed' ; exit 1; }
+
+mkdir eigen
+cd eigen
+wget https://github.com/clab/dynet/releases/download/2.1/eigen-b2e267dc99d4.zip || { echo 'Could not fetch Eigen' ; exit 1; }
+unzip eigen-b2e267dc99d4.zip
+cd ..
+
 cd dynet
 git checkout ${DYNET_COMMIT}
 rm -rf contrib/swig/src/test
@@ -114,7 +121,7 @@ rm -rf ${DEPENDENCIES_DIR}/eigen
 
 cd ${PROJECT_DIR}
 
-${SBT_DIR}/bin/sbt assembly || { echo 'sbt assembly failed' ; exit 1; }
-
-cd ${START_DIR}
+# Uncomment the following lines to compile the project here as well
+# ${SBT_DIR}/bin/sbt assembly || { echo 'sbt assembly failed' ; exit 1; }
+# cd ${START_DIR}
 

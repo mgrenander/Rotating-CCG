@@ -23,8 +23,8 @@ Basic requirements:
 
 If you want to use the pretrained model that uses ELMo you will also need to make sure you have:
 - python3
-- pip3 install allennlp
-- pip3 install thrift
+- pip3 install allennlp==0.4.2
+- pip3 install thrift==0.11.0
 
 If that is all in place, you can run the following command to install the rest of the dependencies:
 
