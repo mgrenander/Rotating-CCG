@@ -155,7 +155,7 @@ object MainLCAStats {
       if (line.isBlank) {
         None
       } else {
-        Some(line.split("\s+").toList.grouped(2).map{case List(x,y) => (x.toInt, y.toInt)}.toList)
+        Some(line.split(" +").toList.grouped(2).map{case List(x,y) => (x.toInt, y.toInt)}.toList)
       }
     }.toList
     file.close()
