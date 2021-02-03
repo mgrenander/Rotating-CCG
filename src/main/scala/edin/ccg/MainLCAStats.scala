@@ -140,11 +140,11 @@ object MainLCAStats {
           break
         } else {
           val nodes = tree.allNodes
-          for (node <- nodes) {
-            val node_span = node.span
-            val adj_node_span = (node_span._1, node_span._2 - 1)
-            if (spans.get.contains(adj_node_span)) {
-              loaded_span_categories ::= node.category.toString
+          val adj_node_spans = nodes.map(node => (node.span._1, node.span._2 - 1))
+          for (span <- spans.get) {
+            val findSpan = adj_node_spans.indexOf(span)
+            if (findSpan != -1) {
+              loaded_span_categories ::= nodes(findSpan).category.toString
             } else {
               loaded_span_categories ::= "NA"
             }
