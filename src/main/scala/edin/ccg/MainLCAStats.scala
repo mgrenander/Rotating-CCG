@@ -143,7 +143,7 @@ object MainLCAStats {
           for (node <- nodes) {
             val node_span = node.span
             val adj_node_span = (node_span._1, node_span._2 - 1)
-            if (spans.contains(adj_node_span)) {
+            if (spans.get.contains(adj_node_span)) {
               loaded_span_categories ::= node.category.toString
             } else {
               loaded_span_categories ::= "NA"
@@ -159,7 +159,7 @@ object MainLCAStats {
     val file = new File(filename)
     val bw = new BufferedWriter(new FileWriter(file))
     for (line <- lines) {
-      bw.write(line)
+      bw.write(line + " ")
     }
     bw.close()
   }
