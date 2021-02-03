@@ -151,8 +151,8 @@ object MainLCAStats {
     if(! new File(fileName).exists())
       System.err.println(s"file $fileName doesn't exist")
     val file = Source.fromFile(fileName)
-    loadedSpans = file.getLines.map { line =>
-      if (line.isBlank) {
+    loadedSpans = file.getLines().map { line =>
+      if (line.isEmpty) {
         None
       } else {
         Some(line.split(" +").toList.grouped(2).map{case List(x,y) => (x.toInt, y.toInt)}.toList)
