@@ -1,12 +1,13 @@
 package edin.ccg
 
-import java.io.File
+import java.io.{BufferedWriter, File, FileWriter}
 import scala.io.StdIn.readLine
 import edin.ccg.representation.DerivationsLoader
 import edin.ccg.representation.category.Category
 import edin.ccg.representation.tree._
 
 import scala.io.Source
+import scala.util.control.Breaks._
 
 
 object MainLCAStats {
@@ -42,10 +43,9 @@ object MainLCAStats {
           val sentId = inputParts.last.toInt
           val spans = loadedSpans(sentId)
           print_loaded_spans(spans)
-        case "all" =>
-          for((tree, i) <- loadedTrees.zipWithIndex) {
-            println("TODO")
-          }
+        case "span_categories" =>
+          val all_loaded_spans = find_all_loaded_spans
+          writeFile("test.cats", all_loaded_spans)
         case "visualise" | "visualize" =>
           assert(inputParts.size >= 2)
           val sentId = inputParts.last.toInt
@@ -114,8 +114,8 @@ object MainLCAStats {
   }
 
   private def print_leaf_spans(origTree:TreeNode):Unit = {
-    val leafNodes = origTree.allNodes
-    for( node <- leafNodes ) {
+    val nodes = origTree.allNodes
+    for( node <- nodes ) {
       println(node.toString + " " + node.span.toString())
     }
   }
@@ -126,6 +126,42 @@ object MainLCAStats {
     } else {
       println(spans.toString)
     }
+  }
+
+  private def find_all_loaded_spans : List[String] = {
+    var loaded_span_categories = List[String]()
+    for((tree, i) <- loadedTrees.zipWithIndex) {
+      if (i%1000 == 0) {
+        println(s"Processed $i trees")
+      }
+      val spans = loadedSpans(i)
+      breakable {
+        if (spans.isEmpty) {
+          break
+        } else {
+          val nodes = tree.allNodes
+          for (node <- nodes) {
+            val node_span = node.span
+            val adj_node_span = (node_span._1, node_span._2 - 1)
+            if (spans.contains(adj_node_span)) {
+              loaded_span_categories ::= node.category.toString
+            } else {
+              loaded_span_categories ::= "NA"
+            }
+          }
+        }
+      }
+    }
+    loaded_span_categories
+  }
+
+  def writeFile(filename: String, lines: Seq[String]): Unit = {
+    val file = new File(filename)
+    val bw = new BufferedWriter(new FileWriter(file))
+    for (line <- lines) {
+      bw.write(line)
+    }
+    bw.close()
   }
 
   private def visualizeTree(origTree:TreeNode, derivationTypesToShow:List[String], info:String):Unit ={
