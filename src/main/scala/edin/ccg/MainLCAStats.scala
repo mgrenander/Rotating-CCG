@@ -1,9 +1,9 @@
 package edin.ccg
 
 import java.io.File
-
 import scala.io.StdIn.readLine
 import edin.ccg.representation.DerivationsLoader
+import edin.ccg.representation.category.Category
 import edin.ccg.representation.tree._
 
 
@@ -29,6 +29,11 @@ object MainLCAStats {
           val sentId = inputParts.last.toInt
           val origTree = loadedTrees(sentId)
           print_leaf_categories(origTree)
+        case "span" =>
+          assert(inputParts.size >= 2)
+          val sentId = inputParts.last.toInt
+          val origTree = loadedTrees(sentId)
+          print_leaf_spans(origTree)
         case "all" =>
           for((tree, i) <- loadedTrees.zipWithIndex) {
             println("TODO")
@@ -97,6 +102,13 @@ object MainLCAStats {
     val leafNodes = origTree.leafs
     for( node <- leafNodes ) {
       println(node.toString())
+    }
+  }
+
+  private def print_leaf_spans(origTree:TreeNode):Unit = {
+    val leafNodes = origTree.leafs
+    for( node <- leafNodes ) {
+      println(node.span.toString())
     }
   }
 
