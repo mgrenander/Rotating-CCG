@@ -40,8 +40,8 @@ object MainLCAStats {
         case "loaded_span" =>
           assert(inputParts.size >= 2)
           val sentId = inputParts.last.toInt
-          val origTree = loadedSpans(sentId)
-          print_loaded_spans(loadedSpans)
+          val spans = loadedSpans(sentId)
+          print_loaded_spans(spans)
         case "all" =>
           for((tree, i) <- loadedTrees.zipWithIndex) {
             println("TODO")
@@ -120,12 +120,11 @@ object MainLCAStats {
     }
   }
 
-  private def print_loaded_spans(spans:List[Option[List[(Int, Int)]]]):Unit = {
-    for( span <- spans ) {
-      if ( span.isEmpty )
-        println("None")
-      else
-        println(span.toString)
+  private def print_loaded_spans(spans:Option[List[(Int, Int)]]):Unit = {
+    if ( spans.isEmpty ) {
+      println("None")
+    } else {
+      println(spans.toString)
     }
   }
 
