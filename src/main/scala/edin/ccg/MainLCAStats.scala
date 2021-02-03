@@ -6,18 +6,21 @@ import edin.ccg.representation.DerivationsLoader
 import edin.ccg.representation.category.Category
 import edin.ccg.representation.tree._
 
+import scala.io.Source
+
 
 object MainLCAStats {
 
   private var loadedTrees = List[TreeNode]()
-  private var loadedSpans = List[List[(Int, Int)]]()
+  private var loadedSpans = List[Option[List[(Int, Int)]]]()
 
   def main(args:Array[String]) : Unit = {
 
-    assert(args.length <= 1)
+    assert(args.length <= 2)
 
-    if(args.length == 1){
+    if(args.length == 2){
       loadTrees(args(0))
+      loadSpans(args(1))
     }
 
     var stop = false
@@ -142,6 +145,20 @@ object MainLCAStats {
       System.err.println(s"file $fileName doesn't exist")
     loadedTrees = DerivationsLoader.fromFile(fileName).toList
     println(loadedTrees.size+" trees successfully loaded")
+  }
+
+  private def loadSpans(fileName:String) : Unit = {
+    if(! new File(fileName).exists())
+      System.err.println(s"file $fileName doesn't exist")
+    val file = Source.fromFile(fileName)
+    loadedSpans = file.getLines.map { line =>
+      if (line.isBlank) {
+        None
+      } else {
+        Some(line.split("\s+").toList.grouped(2).map{case List(x,y) => (x.toInt, y.toInt)}.toList)
+      }
+    }.toList
+    file.close()
   }
 
 }
