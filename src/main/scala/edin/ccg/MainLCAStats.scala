@@ -114,9 +114,9 @@ object MainLCAStats {
   }
 
   private def print_leaf_spans(origTree:TreeNode):Unit = {
-    val leafNodes = origTree.leafs
+    val leafNodes = origTree.allNodes
     for( node <- leafNodes ) {
-      println(node.span.toString())
+      println(node.toString + " " + node.span.toString())
     }
   }
 
