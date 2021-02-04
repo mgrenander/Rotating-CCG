@@ -123,6 +123,10 @@ object MainLCAStats {
 
   private def predict_spans(span_predictor : List[String]) : Array[Option[List[(Int, Int)]]] = {
     val predictions = new Array[Option[List[(Int, Int)]]](loadedTrees.size)
+    for (i <- loadedTrees.indices) {
+      predictions(i) = None
+    }
+
     for((tree, i) <- loadedTrees.zipWithIndex) {
       if (i%1000 == 0) {
         println(s"Processed $i trees")
