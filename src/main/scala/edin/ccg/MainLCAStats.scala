@@ -137,7 +137,7 @@ object MainLCAStats {
           if (predictions(i).isEmpty) {
             predictions(i) = Some(List(predicted_span))
           } else {
-            predictions(i).get ::= predicted_span
+            predictions(i) = Some(predictions(i).get ++ List(predicted_span))
           }
         }
       }
