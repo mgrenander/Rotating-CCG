@@ -23,7 +23,7 @@ object MainLCAStats {
       loadTrees(args(0))
       loadSpans(args(1))
     }
-
+    var topk_categories = List("NP", "NP[nb]", "NP[nb]/N", "S/(S\\NP)", "N/N", "N")
     var stop = false
     while(!stop){
       val inputParts = readLine("> ").split(" +").toList
@@ -46,61 +46,18 @@ object MainLCAStats {
         case "span_categories" =>
           val all_loaded_spans = find_all_loaded_spans
           writeFile("test.cats", all_loaded_spans)
-        case "visualise" | "visualize" =>
+        case "predict_spans" =>
           assert(inputParts.size >= 2)
-          val sentId = inputParts.last.toInt
-          val stuff = inputParts.tail.init
-          val origTree = loadedTrees(sentId)
-          val derivationTypes = if (stuff.nonEmpty) stuff else List[String]("original")
-          visualizeTree(origTree, derivationTypes, s"$sentId")
-        case "visualise_string" | "visualize_string" =>
-          val stuff = inputParts.tail.takeWhile(!_.startsWith("("))
-          val derivationTypes = if (stuff.nonEmpty) stuff else List[String]("original")
-          val origTree = DerivationsLoader.fromString(inputParts.dropWhile(!_.startsWith("(")).mkString(" "))
-          visualizeTree(origTree, derivationTypes, "string")
-        case "print_string" =>
-          println(loadedTrees(inputParts(1).toInt).toCCGbankString)
-        case "grep" =>
-          val s = inputParts.tail.mkString(" ")
-          for((tree, i) <- loadedTrees.zipWithIndex){
-            val sent = tree.words.mkString(" ").toLowerCase
-            if(sent.toLowerCase contains s){
-              println(s"$i: $sent")
-            }
-          }
-        case "grep_cat" =>
-          assert(inputParts.size==2)
-          val s = inputParts(1)
-          for((tree, i) <- loadedTrees.zipWithIndex){
-            if(tree.allNodes.exists(_.category.toString == s)) {
-              val sent = tree.words.mkString(" ").toLowerCase
-              println(s"$i: $sent")
-            }
-          }
-        case "grep_comb" =>
-          assert(inputParts.size==2)
-          val s = inputParts(1)
-          for((tree, i) <- loadedTrees.zipWithIndex){
-            if(tree.allNodes.flatMap(_.getCombinator).exists(_.toString == s)) {
-              val sent = tree.words.mkString(" ").toLowerCase
-              println(s"$i: $sent")
-            }
-          }
-        case "deps" =>
-          assert(inputParts.size == 2)
-          val sentId = inputParts(1).toInt
-          val origTree = loadedTrees(sentId)
-          origTree.depsVisualize()
-        case "deps_string" =>
-          val origTree = DerivationsLoader.fromString(inputParts.dropWhile(!_.startsWith("(")).mkString(" "))
-          origTree.depsVisualize()
+          val n = inputParts.last.toInt
+          val span_predictor = topk_categories.take(n)
+          val predictions = predict_spans(span_predictor)
+          writePredictions(s"test.$n.preds", predictions)
         case "exit" | "done" | "quit" =>
           stop=true
         case "" =>
         case _ =>
           System.err.println("unknown command "+inputParts.head)
       }
-
     }
 
     println("Done")
@@ -164,29 +121,41 @@ object MainLCAStats {
     bw.close()
   }
 
-  private def visualizeTree(origTree:TreeNode, derivationTypesToShow:List[String], info:String):Unit ={
-    lazy val leftBranch = origTree.toLeftBranching
-    lazy val rightBranch = origTree.toRightBranching
-    lazy val revealBranch = origTree.toRevealingBranching
+  private def predict_spans(span_predictor : List[String]) : Array[Option[List[(Int, Int)]]] = {
+    val predictions = new Array[Option[List[(Int, Int)]]](loadedTrees.size)
+    for((tree, i) <- loadedTrees.zipWithIndex) {
+      if (i%1000 == 0) {
+        println(s"Processed $i trees")
+      }
 
-    val toShow : List[(TreeNode, String)] = if(derivationTypesToShow.head == "all"){
-      if(rightBranch == origTree)
-        List((revealBranch, "revealing"), (leftBranch, "left"), (rightBranch, "right_and_orig"))
-      else
-        List((revealBranch, "revealing"), (leftBranch, "left"), (rightBranch, "right"), (origTree, "original"))
-    }else{
-      derivationTypesToShow.map{
-        case "original" | "default" => (origTree, "original")
-        case "left"  => (leftBranch, "left")
-        case "right"  => (rightBranch, "right")
-        case "revealing" | "reveal"  => (revealBranch, "revealing")
+      val nodes = tree.allNodes
+      for (node <- nodes) {
+        // Check if node's category is in span_predictor
+        if (span_predictor.contains(node.category.toString)) {
+          // Append this span to array at i. Decrement the span endpoint due to formatting.
+          val predicted_span = (node.span._1, node.span._2 - 1)
+          if (predictions(i).isEmpty) {
+            predictions(i) = Some(List(predicted_span))
+          } else {
+            predictions(i).get ::= predicted_span
+          }
+        }
       }
     }
+    predictions
+  }
 
-    for((node, derivationType) <- toShow){
-      node.visualize(s"_____${info}_____${derivationType}______")
+  private def writePredictions(filename : String, predictions : Array[Option[List[(Int, Int)]]]) : Unit = {
+    val file = new File(filename)
+    val bw = new BufferedWriter(new FileWriter(file))
+    for (prediction <- predictions) {
+      if (prediction.isEmpty) {
+        bw.write("\n")
+      } else {
+        bw.write(prediction.get.toString() + "\n")
+      }
     }
-
+    bw.close()
   }
 
   private def loadTrees(fileName:String) : Unit = {
