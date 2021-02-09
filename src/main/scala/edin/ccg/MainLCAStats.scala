@@ -19,6 +19,10 @@ object MainLCAStats {
 
     assert(args.length <= 2)
 
+    if(args.length == 1) {
+      loadTrees(args(0))
+    }
+
     if(args.length == 2){
       loadTrees(args(0))
       loadSpans(args(1))
@@ -45,13 +49,13 @@ object MainLCAStats {
           print_loaded_spans(spans)
         case "span_categories" =>
           val all_loaded_spans = find_all_loaded_spans
-          writeFile("test.cats", all_loaded_spans)
+          writeFile("dev.cats", all_loaded_spans)
         case "predict_spans" =>
           assert(inputParts.size >= 2)
           val n = inputParts.last.toInt
           val span_predictor = topk_categories.take(n)
           val predictions = predict_spans(span_predictor)
-          writePredictions(s"test.$n.preds", predictions)
+          writePredictions(s"dev.$n.preds", predictions)
         case "exit" | "done" | "quit" =>
           stop=true
         case "" =>
