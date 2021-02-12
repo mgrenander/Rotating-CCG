@@ -165,8 +165,8 @@ object MainLCAStats {
       val nodes = tree.allNodes
       for (node <- nodes) {
         // Make sure we don't double count the parents of UnaryNodes
-        val children = node.children
-        if (!(children.nonEmpty && children.map(x => x.span).contains(node.span))) {
+//        val children = node.children
+//        if (!(children.nonEmpty && children.map(x => x.span).contains(node.span))) {
           // Check if node's category is in span_predictor
           if (span_predictor.contains(node.category.toString)) {
             // Append this span to array at i. Decrement the span endpoint due to formatting.
@@ -177,7 +177,7 @@ object MainLCAStats {
               predictions(i) = Some(predictions(i).get ++ List(predicted_span))
             }
           }
-        }
+//        }
       }
     }
     predictions
