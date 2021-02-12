@@ -57,8 +57,8 @@ object MainLCAStats {
           val s = inputParts.last
           val mention_spans = find_mention_span(s)
           val mention_span_len = mention_spans.length
-          print(mention_spans.toString())
-          print(s"Found $mention_span_len spans corresponding to $s.")
+          println(mention_spans.toString())
+          println(s"Found $mention_span_len spans corresponding to $s.")
         case "exit" | "done" | "quit" =>
           stop=true
         case "" =>
@@ -132,7 +132,7 @@ object MainLCAStats {
           for (span <- spans.get) {
             val findSpan = adj_node_spans.indexOf(span)
             if (findSpan != -1 && nodes(findSpan).category.toString == cat_string) {
-              cat_spans ::= nodes(findSpan).toString
+              cat_spans ::= nodes(findSpan).words
             }
           }
         }
