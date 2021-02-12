@@ -99,19 +99,19 @@ object MainLCAStats {
         println(s"Processed $i trees")
       }
       val spans = loadedSpans(i)
-      breakable {
-        if (spans.isEmpty) {
-          break
-        } else {
-          val nodes = tree.allNodes
-          val adj_node_spans = nodes.map(node => (node.span._1, node.span._2 - 1))
-          for (span <- spans.get) {
-            val findSpan = adj_node_spans.indexOf(span)
-            if (findSpan != -1) {
+      if (spans.isDefined) {
+        val nodes = tree.allNodes
+        val adj_node_spans = nodes.map(node => (node.span._1, node.span._2 - 1))
+        for (span <- spans.get) {
+          val findSpan = adj_node_spans.indexOf(span)
+          if (findSpan != -1) {
+            // Make sure we don't double count the parents of UnaryNodes
+            val children = nodes(findSpan).children
+            if (!(children.nonEmpty && children.map(x => x.span).contains(nodes(findSpan).span))) {
               loaded_span_categories ::= nodes(findSpan).category.toString
-            } else {
-              loaded_span_categories ::= "NA"
             }
+          } else {
+            loaded_span_categories ::= "NA"
           }
         }
       }
@@ -164,14 +164,18 @@ object MainLCAStats {
 
       val nodes = tree.allNodes
       for (node <- nodes) {
-        // Check if node's category is in span_predictor
-        if (span_predictor.contains(node.category.toString)) {
-          // Append this span to array at i. Decrement the span endpoint due to formatting.
-          val predicted_span = (node.span._1, node.span._2 - 1)
-          if (predictions(i).isEmpty) {
-            predictions(i) = Some(List(predicted_span))
-          } else {
-            predictions(i) = Some(predictions(i).get ++ List(predicted_span))
+        // Make sure we don't double count the parents of UnaryNodes
+        val children = node.children
+        if (!(children.nonEmpty && children.map(x => x.span).contains(node.span))) {
+          // Check if node's category is in span_predictor
+          if (span_predictor.contains(node.category.toString)) {
+            // Append this span to array at i. Decrement the span endpoint due to formatting.
+            val predicted_span = (node.span._1, node.span._2 - 1)
+            if (predictions(i).isEmpty) {
+              predictions(i) = Some(List(predicted_span))
+            } else {
+              predictions(i) = Some(predictions(i).get ++ List(predicted_span))
+            }
           }
         }
       }
