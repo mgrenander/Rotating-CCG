@@ -23,7 +23,7 @@ object MainLCAStats {
       loadTrees(args(0))
       loadSpans(args(1))
     }
-    val topk_categories = List("""NP""", """NP[nb]""", """NP[nb]/N""", """S/(S\NP)""", """N/N""", """N""")
+    val topk_categories = List("""NP""", """NP[nb]""", """NP[nb]/N""", """N/N""", """N""")
     var stop = false
     while(!stop){
       val inputParts = readLine("> ").split(" +").toList
