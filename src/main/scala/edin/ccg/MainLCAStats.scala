@@ -132,7 +132,7 @@ object MainLCAStats {
           for (span <- spans.get) {
             val findSpan = adj_node_spans.indexOf(span)
             if (findSpan != -1 && nodes(findSpan).category.toString == cat_string) {
-              cat_spans ::= nodes(findSpan).words
+              cat_spans ::= nodes(findSpan).words.mkString(" ")
             }
           }
         }
