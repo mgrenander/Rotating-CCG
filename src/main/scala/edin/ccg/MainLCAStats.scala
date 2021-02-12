@@ -19,10 +19,6 @@ object MainLCAStats {
 
     assert(args.length <= 2)
 
-    if(args.length == 1) {
-      loadTrees(args(0))
-    }
-
     if(args.length == 2){
       loadTrees(args(0))
       loadSpans(args(1))
@@ -56,6 +52,13 @@ object MainLCAStats {
           val span_predictor = topk_categories.take(n)
           val predictions = predict_spans(span_predictor)
           writePredictions(s"dev.$n.preds", predictions)
+        case "find_spans" =>
+          assert(inputParts.size >= 2)
+          val s = inputParts.last
+          val mention_spans = find_mention_span(s)
+          val mention_span_len = mention_spans.length
+          print(mention_spans.toString())
+          print(s"Found $mention_span_len spans corresponding to $s.")
         case "exit" | "done" | "quit" =>
           stop=true
         case "" =>
@@ -114,6 +117,29 @@ object MainLCAStats {
       }
     }
     loaded_span_categories
+  }
+
+  private def find_mention_span(cat_string : String) : List[String] = {
+    var cat_spans = List[String]()
+    for((tree, i) <- loadedTrees.zipWithIndex) {
+      val spans = loadedSpans(i)
+      breakable {
+        if (spans.isEmpty) {
+          break
+        } else {
+          val nodes = tree.allNodes
+          val adj_node_spans = nodes.map(node => (node.span._1, node.span._2 - 1))
+          for (span <- spans.get) {
+            val findSpan = adj_node_spans.indexOf(span)
+            if (findSpan != -1 && nodes(findSpan).category.toString == cat_string) {
+              cat_spans ::= nodes(findSpan).toString
+            }
+          }
+        }
+      }
+    }
+
+    cat_spans
   }
 
   def writeFile(filename: String, lines: Seq[String]): Unit = {
