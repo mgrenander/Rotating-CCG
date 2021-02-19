@@ -59,6 +59,9 @@ object MainLCAStats {
           val mention_span_len = mention_spans.length
           println(mention_spans.toString())
           println(s"Found $mention_span_len spans corresponding to $s.")
+        case "find_na_spans" =>
+          val mention_spans = findNASpans()
+          writePredictions("dev.na.spans", mention_spans)
         case "exit" | "done" | "quit" =>
           stop=true
         case "" =>
@@ -194,6 +197,35 @@ object MainLCAStats {
       }
     }
     bw.close()
+  }
+
+  private def findNASpans() : Array[Option[List[(Int, Int)]]] = {
+    val na_spans = new Array[Option[List[(Int, Int)]]](loadedTrees.size)
+    for (i <- loadedTrees.indices) {
+      na_spans(i) = None
+    }
+
+    for((tree, i) <- loadedTrees.zipWithIndex) {
+      if (i % 1000 == 0) {
+        println(s"Processed $i trees")
+      }
+
+      val spans = loadedSpans(i)
+      if (spans.isDefined) {
+        val nodes = tree.allNodes
+        val adj_node_spans = nodes.map(node => (node.span._1, node.span._2 - 1))
+        for (span <- spans.get) {
+          if (adj_node_spans.indexOf(span) == -1) { // Span was not found in tree
+            if (na_spans(i).isEmpty) {
+              na_spans(i) = Some(List(span))
+            } else {
+              na_spans(i) = Some(na_spans(i).get ++ List(span))
+            }
+          }
+        }
+      }
+    }
+    na_spans
   }
 
   private def loadTrees(fileName:String) : Unit = {
