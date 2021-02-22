@@ -113,10 +113,10 @@ object MainLCAStats {
               loaded_span_categories ::= nodes(findSpan).category.toString
             } else {
               // Make sure we don't double count the parents of UnaryNodes
-              val children = nodes(findSpan).children
-              if (!(children.nonEmpty && children.map(x => x.span).contains(nodes(findSpan).span))) {
-                loaded_span_categories ::= nodes(findSpan).category.toString
-              }
+//              val children = nodes(findSpan).children
+//              if (!(children.nonEmpty && children.map(x => x.span).contains(nodes(findSpan).span))) {
+              loaded_span_categories ::= nodes(findSpan).category.toString
+//              }
             }
           } else {
             loaded_span_categories ::= "NA"
