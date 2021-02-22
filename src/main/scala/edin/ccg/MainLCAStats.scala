@@ -108,7 +108,6 @@ object MainLCAStats {
         for (span <- spans.get) {
           val findSpan = adj_node_spans.indexOf(span)
           if (findSpan != -1) {
-            val span_count = adj_node_spans.count(_ == span)
             // Make sure we don't double count the parents of UnaryNodes. children.map(x => x.span).contains(nodes(findSpan).span
             val children = nodes(findSpan).children
             if (children.nonEmpty && children.length == 1) {
