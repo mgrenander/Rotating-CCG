@@ -246,7 +246,18 @@ object MainLCAStats {
         Some(line.split(" +").toList.grouped(2).map{case List(x,y) => (x.toInt, y.toInt)}.toList)
       }
     }.toList
+    val totalSpans = spansLen()
+    println(s"$totalSpans spans loaded.")
     file.close()
   }
 
+  private def spansLen() : Int = {
+    var spansCount = 0
+    for (loadedSpan <- loadedSpans) {
+      if (loadedSpan.isDefined) {
+        spansCount += loadedSpan.get.length
+      }
+    }
+    spansCount
+  }
 }
