@@ -32,7 +32,7 @@ object MainVisualize {
         case "list" =>
           assert(inputParts.size <= 3)
           val start = if(inputParts.size<=2) 0 else inputParts(1).toInt
-          val take = if(inputParts.size <=3 || inputParts(2) == "*") loadedTrees.size else inputParts(2).toInt
+          val take = if(inputParts.size <=2 || inputParts(2) == "*") loadedTrees.size else inputParts(2).toInt
           for((tree, i) <- loadedTrees.zipWithIndex.slice(start, start + take)){
             println(i+" : "+tree.words.mkString(" "))
           }
