@@ -116,7 +116,7 @@ object MainVisualize {
     }
 
     for((node, derivationType) <- toShow){
-      node.visualize(s"_____${info}_____${derivationType}______")
+      node.visualize(s"${info}")
     }
 
   }
