@@ -46,7 +46,7 @@ object TreeVisualizer {
       val dotCmd = s"dot -Tpng $tmpFileName -O"
       val pDot = Runtime.getRuntime.exec(dotCmd)
       pDot.waitFor()
-      copyFile(s"$tmpFileName.png", "./figures/" + outFile.getName)
+      copyFile(s"$tmpFileName.png", s"./figures/$graphLabel.png")
       new File(tmpFileName).delete()
       new File(s"$tmpFileName.png").delete()
     }
