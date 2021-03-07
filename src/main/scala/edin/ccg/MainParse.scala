@@ -74,7 +74,7 @@ object MainParse {
           DynetSetup.cg_renew()
           if(i%1 == 0)
             System.err.println(s"processing $i")
-          val words = line.split(" +").toList
+          val words = line.split(" +").toList.map(x => x.replaceAll("<NE>", " "))
           val searcher = Parser.searcherForModel(
             model = models.head,
             sent = words,
