@@ -111,13 +111,23 @@ object DerivationsLoader {
 
 
   private def tokenize(s:String) : Array[String] = {
-    s.
-      replaceAll("<"," < ").
-      replaceAll(">"," > ").
-      replaceAll("X (([A-Za-z]+ )+)X", "$1").
-      replaceAll(" ", "-").
-      dropRight(1).concat(" X").reverse.concat(" X").reverse.
-      trim().split(" +")
+    val s_tmp = s.replaceAll("<"," < ").replaceAll(">"," > ")
+    val reg_str = "X (([^X][A-Za-z0-9]+ )+)X"
+    val reg_exp = reg_str.r
+    val parts = s_tmp.split(reg_str).toList
+    val ne_arr = reg_exp.findAllIn(s_tmp).toList.map(manipulateNEString)
+    intersperse(parts, ne_arr).toArray
+  }
+
+  private def manipulateNEString(x : String) : String = {
+    x.replaceAll(" ", "-")
+      .substring(2, x.length - 2)
+      .concat(" X").reverse.concat(" X").reverse
+  }
+
+  def intersperse(a : List[String], b : List[String]): List[String] = a match {
+    case first :: rest => first :: intersperse(b, rest)
+    case _             => b
   }
 
   private def recognizeCCGcombinatorUnary(childCat:Category, parentCat:Category) : CombinatorUnary =
