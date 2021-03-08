@@ -112,9 +112,11 @@ object DerivationsLoader {
 
   private def tokenize(s:String) : Array[String] = {
     s.
-      replaceAllLiterally("<"," < ").
-      replaceAllLiterally(">"," > ").
-      replaceAll("X (([A-Za-z]+ )+)X", "$1".replaceAll(" ", "-")).
+      replaceAll("<"," < ").
+      replaceAll(">"," > ").
+      replaceAll("X (([A-Za-z]+ )+)X", "$1").
+      replaceAll(" ", "-").
+      dropRight(1).concat(" X").prependedAll("X ").
       trim().split(" +")
   }
 
