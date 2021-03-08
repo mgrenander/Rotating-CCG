@@ -116,7 +116,8 @@ object DerivationsLoader {
     val reg_exp = reg_str.r
     val parts = s_tmp.split(reg_str).toList
     val ne_arr = reg_exp.findAllIn(s_tmp).toList.map(manipulateNEString)
-    intersperse(parts, ne_arr).toArray
+    val assembled = intersperse(parts, ne_arr).mkString(" ")
+    assembled.trim().split(" +")
   }
 
   private def manipulateNEString(x : String) : String = {
