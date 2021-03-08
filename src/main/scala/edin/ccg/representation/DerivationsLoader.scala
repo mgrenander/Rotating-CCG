@@ -114,6 +114,7 @@ object DerivationsLoader {
     s.
       replaceAllLiterally("<"," < ").
       replaceAllLiterally(">"," > ").
+      replaceAll("X (([A-Za-z]+ )+)X", "$1".replaceAll(" ", "-")).
       trim().split(" +")
   }
 
