@@ -112,7 +112,7 @@ object DerivationsLoader {
 
   private def tokenize(s:String) : Array[String] = {
     val s_tmp = s.replaceAll("<"," < ").replaceAll(">"," > ")
-    val reg_str = "X (([^X][:'`,\\-.A-Za-z0-9]* )+)X"
+    val reg_str = "X (([:'`,\\-.A-Za-z0-9]* )+)X"
     val reg_exp = reg_str.r
     val parts = s_tmp.split(reg_str).toList
     val ne_arr = reg_exp.findAllIn(s_tmp).toList.map(manipulateNEString)
@@ -122,8 +122,8 @@ object DerivationsLoader {
 
   private def manipulateNEString(x : String) : String = {
     x.replaceAll(" ", "-")
-      .substring(2, x.length - 2)
-      .concat(" X").reverse.concat(" X").reverse
+      .substring(4, x.length - 2)
+      .concat(" X").reverse.concat(" X X").reverse
   }
 
   def intersperse(a : List[String], b : List[String]): List[String] = a match {
