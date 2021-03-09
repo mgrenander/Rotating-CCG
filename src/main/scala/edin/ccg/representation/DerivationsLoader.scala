@@ -41,7 +41,6 @@ object DerivationsLoader {
   }
 
   def fromString(s:String) : TreeNode = {
-    println("TOKENIZING: " + s)
     val tokens = tokenize(s)
     val (node, consumedTokensCount, _) = processTokens(tokens, 0, 0)
     assert(consumedTokensCount == tokens.length)
